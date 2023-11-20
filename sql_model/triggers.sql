@@ -1,8 +1,7 @@
 CREATE OR REPLACE FUNCTION order_products_tr() RETURNS TRIGGER LANGUAGE PLPGSQL
 AS 
 $$
-DECLARE quantity_count BIGINT;
-totalprice NUMERIC;
+DECLARE
 percentAmount NUMERIC;
 product_price NUMERIC;
 BEGIN
@@ -16,9 +15,11 @@ BEGIN
     IF NEW.discount_type LIKE 'percent' THEN
         New.sum = NEW.sum - percentAmount;
     END IF;
-    SELECT SUM(quantity) FROM order_products WHERE order_id = NEW.order_id into quantity_count;
-    SELECT SUM(sum) FROM order_products WHERE order_id = NEW.order_id into totalprice;
-    UPDATE orders SET total_count = quantity_count, total_price = totalprice, updated_at = CURRENT_TIMESTAMP
+    UPDATE orders 
+    SET 
+    total_count =(SELECT SUM(quantity) FROM order_products WHERE order_id = NEW.order_id), 
+    total_price = (SELECT SUM(sum) FROM order_products WHERE order_id = NEW.order_id), 
+    updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.order_id;
 
     RETURN NEW;
