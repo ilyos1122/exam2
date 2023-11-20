@@ -11,12 +11,10 @@ BEGIN
     NEW.sum = NEW.quantity * NEW.price;
     percentAmount = (NEW.quantity * NEW.price)/100 * NEW.discount_amount;
     IF NEW.discount_type LIKE 'fixed' THEN 
-        UPDATE order_products SET sum = NEW.quantity * NEW.price - NEW.discount_amount
-        WHERE order_id = NEW.order_id;
+        NEW.sum = NEW.quantity * NEW.price - NEW.discount_amount;
     END IF; 
     IF NEW.discount_type LIKE 'percent' THEN
-        UPDATE order_products SET sum = NEW.sum - percentAmount
-        WHERE order_id = NEW.order_id;
+        New.sum = NEW.sum - percentAmount;
     END IF;
     SELECT SUM(quantity) FROM order_products WHERE order_id = NEW.order_id into quantity_count;
     SELECT SUM(sum) FROM order_products WHERE order_id = NEW.order_id into totalprice;
